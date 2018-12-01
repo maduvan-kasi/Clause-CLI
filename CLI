@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+
+import sys
+import getpass
+import requests
+
+SERVER_URL = "http://localhost:8080"
+token = ""
+
+def sendPostRequest(subdomain, payload):
+	r = requests.post(SERVER_URL + subdomain, json=payload)
+	if r.status_code == 200:
+		return r.text
+	elif r.status_code == 500:
+		print("There is a problem with the server. Please try again later.")
+		exit()
+	else:
+		return r.status_code
+
+print("Welcome to Clause CLI: the Command Line Interface for Secret Santa!")
+print("Type any command to continue.")
+
+while True:
+	command = input().split()
+	if command[0] == "exit":
+		print("Thanks for using Clause CLI - see you soon!")
+		exit()
+	elif command[0] == "signin":
+		pswd = getpass.getpass("Password: ")
+		payload = {}
+		payload["user"] = command[1]
+		payload["pass"] = pswd
+		response = sendPostRequest("/signin", payload)
+		if response == 403:
+			print("Sorry, that info isn't quite right.")
+		else:
+			token = response
+			print("You are now signed in!")
+	else:
+		payload = {}
+		payload["token"] = token
+		response = sendPostRequest("/home", payload)
+		if response == 403:
+			print("Sorry, you aren't signed in.")
+		else:
+			print(response)
+
+
+# if len(sys.argv) == 1:
+
+# 	exit()
+# elif sys.argv[1] == "signup":
+# 	print("We going international!")
+# 	payload = {}
+# 	payload["user"] = sys.argv[2]
+# 	payload["pass"] = sys.argv[3]
+# 	r = requests.post('http://localhost:8080/signup', json=payload)
+# 	print(r.text)
+# 	exit()
+# elif sys.argv[1] == "signin":
+# 	print("We been going international!")
+	
+# 	exit()

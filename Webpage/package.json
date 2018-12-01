@@ -1,0 +1,15 @@
+{
+  "name": "webpage",
+  "version": "1.0.0",
+  "description": "Website hosting the server for Clause CLI",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "express": "^4.16.4"
+  }
+}
