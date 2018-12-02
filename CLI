@@ -1,63 +1,100 @@
 #!/usr/bin/env python3
 
 import sys
+import datetime
 import getpass
 import requests
 
 SERVER_URL = "http://localhost:8080"
+group = ""
 token = ""
 
 def sendPostRequest(subdomain, payload):
+	payload["group"] = group
+	payload["token"] = token
 	r = requests.post(SERVER_URL + subdomain, json=payload)
-	if r.status_code == 200:
-		return r.text
-	elif r.status_code == 500:
+	if r.status_code == 500:
 		print("There is a problem with the server. Please try again later.")
 		exit()
 	else:
-		return r.status_code
+		return r
+
+def selectGroup():
+	global group
+	while group == "":
+		command = input("Enter your Group name or type 'Create Group': ").strip()
+		if command.lower() == "create group":
+			groupName = input("Choose a Group name: ").strip()
+			validDate = False
+			while validDate == False:
+				eventDate = input("Choose a date for your Secret Santa: [YYYY/MM/DD] ").split("/")
+				try :
+					for i in range(3):
+						eventDate[i] = int(eventDate[i])
+					validDate = True
+				except:
+					print("Sorry, that doesn't seem to be a valid date.")
+			eventDate = datetime.date(eventDate[0], eventDate[1], eventDate[2])
+			response = sendPostRequest("/creategroup", {"groupName":groupName, "date":eventDate.isoformat()})
+			if response.status_code == 403:
+				print("Sorry, that Group name is taken.")
+			else:
+				group = groupName
+				print("Your group has been created.")
+		else:
+			response = sendPostRequest("/findgroup", {"groupName":command})
+			if response.status_code == 403:
+				print("Sorry, that is not a valid Group name.")
+			else:
+				group = command
+
+def signIn():
+	global token
+	while token == "":
+		userName = input("Please enter your Name: ").strip()
+		passWord = getpass.getpass("Please enter your Password: ")
+		response = sendPostRequest("/signin", {"user": userName, "pass": passWord})
+		if response.status_code == 404:
+			print("That person is not in this group.")
+			createAccount = input("Would you like register as a new member? [Y/N] ").strip().lower()
+			if createAccount == "y":
+				signUp(userName)
+		elif response.status_code == 403:
+			print("Sorry, that password isn't quite right.")
+		else:
+			token = response.text
+			print("You are now signed in!")
+
+def signUp(userName):
+	global token
+	passWord = getpass.getpass("Please choose a Password: ")
+	repeatPassWord = getpass.getpass("Please confirm your Password: ")
+	while passWord != repeatPassWord:
+		print("Sorry, your passwords don't match.")
+		passWord = getpass.getpass("Please choose a Password: ")
+		repeatPassWord = getpass.getpass("Please confirm your Password: ")
+	response = sendPostRequest("/signup", {"user": userName, "pass": passWord})
+	token = response.text
+	print("You are now signed in!")
+
+def checkStatus():
+	response = sendPostRequest("/home", {})
+	print(response.text)
+	if response.status_code == 201:
+		drawNames = input("Would you like to draw names now? [Y/N] ").strip().lower()
+		if drawNames == "y":
+			response = sendPostRequest("/draw", {})
+		else:
+			mainLoop()
+	else:
+		mainLoop()
+
+def mainLoop():
+	print("wus good man")
 
 print("Welcome to Clause CLI: the Command Line Interface for Secret Santa!")
-print("Type any command to continue.")
+selectGroup()
+signIn()
+checkStatus()
+print("Good Job!")
 
-while True:
-	command = input().split()
-	if command[0] == "exit":
-		print("Thanks for using Clause CLI - see you soon!")
-		exit()
-	elif command[0] == "signin":
-		pswd = getpass.getpass("Password: ")
-		payload = {}
-		payload["user"] = command[1]
-		payload["pass"] = pswd
-		response = sendPostRequest("/signin", payload)
-		if response == 403:
-			print("Sorry, that info isn't quite right.")
-		else:
-			token = response
-			print("You are now signed in!")
-	else:
-		payload = {}
-		payload["token"] = token
-		response = sendPostRequest("/home", payload)
-		if response == 403:
-			print("Sorry, you aren't signed in.")
-		else:
-			print(response)
-
-
-# if len(sys.argv) == 1:
-
-# 	exit()
-# elif sys.argv[1] == "signup":
-# 	print("We going international!")
-# 	payload = {}
-# 	payload["user"] = sys.argv[2]
-# 	payload["pass"] = sys.argv[3]
-# 	r = requests.post('http://localhost:8080/signup', json=payload)
-# 	print(r.text)
-# 	exit()
-# elif sys.argv[1] == "signin":
-# 	print("We been going international!")
-	
-# 	exit()
