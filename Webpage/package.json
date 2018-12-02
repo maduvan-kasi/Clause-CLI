@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chance": "^1.0.17",
     "crypto": "^1.0.1",
     "express": "^4.16.4"
   }

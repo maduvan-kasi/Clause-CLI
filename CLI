@@ -32,10 +32,10 @@ def selectGroup():
 				try :
 					for i in range(3):
 						eventDate[i] = int(eventDate[i])
+					eventDate = datetime.date(eventDate[0], eventDate[1], eventDate[2])
 					validDate = True
 				except:
 					print("Sorry, that doesn't seem to be a valid date.")
-			eventDate = datetime.date(eventDate[0], eventDate[1], eventDate[2])
 			response = sendPostRequest("/creategroup", {"groupName":groupName, "date":eventDate.isoformat()})
 			if response.status_code == 403:
 				print("Sorry, that Group name is taken.")
@@ -91,22 +91,23 @@ def checkStatus():
 
 
 def chatManager():
-	response = sendPostRequest("/chats", {})
-	print(response.text)
+	selectChat = ""
+	while selectChat != "exit":
+		response = sendPostRequest("/chats", {})
+		print(response.text)
 
-	chats = response.text.split('\n')
-	sentChats = chats[1:chats.index("Received Chats:")]
-	receivedChats = chats[chats.index("Received Chats:")+1:]
+		chats = response.text.split('\n')
+		sentChats = chats[1:chats.index("Received Chats:")]
+		receivedChats = chats[chats.index("Received Chats:")+1:]
 
-	print("Choose a chat to continue it, or type another name to start a new one.")
-	selectChat = input("Who would you like to chat with? ").strip().capitalize()
+		print("Choose a chat to continue it, or type another name to start a new one.")
+		selectChat = input("Who would you like to chat with? ").strip().capitalize()
 
-	if (selectChat in sentChats) or (selectChat in receivedChats):
-		chatType = "sent" if (selectChat in sentChats) else "received"
-		displayChats(chatType, selectChat)
-	else:
-		sendChat("send", selectChat, True)
-	chatManager()
+		if (selectChat in sentChats) or (selectChat in receivedChats):
+			chatType = "sent" if (selectChat in sentChats) else "received"
+			displayChats(chatType, selectChat)
+		elif selectChat != "exit":
+			sendChat("send", selectChat, True)
 	
 def displayChats(chatType, chatee):
 	response = sendPostRequest("/viewChat", {"type":chatType, "chatee":chatee})
@@ -122,12 +123,66 @@ def sendChat(chatType, chatee, new):
 	print("Your message has been sent.")
 
 
+def wishListManager(command):
+	command = command.split()
+	if len(command) > 1:
+		displayWishList(command[1].capitalize())
+	else:
+		wishlister = input("Who's wishlist would you like to see? ").strip().capitalize()
+		displayWishList(wishlister)
+
+def displayWishList(wishlister):
+	response = sendPostRequest("/viewWishList", {"wishlister":wishlister})
+	if response.status_code == 404:
+		print("Sorry, that person is not in this group.")
+	else:
+		print(response.text)
+		if response.status_code == 201:
+			updateWishList()
+
+def updateWishList():
+	changeItem = input("Would you like to add or delete an item from your wishlist? [Add/Delete/No] ").strip().lower()
+	if changeItem == "add":
+		addToWishList()
+	elif changeItem == "delete":
+		deleteItem = input("What is the name of the item you would like to remove? ").strip().capitalize()
+		response = sendPostRequest("/removeWishList", {"item": deleteItem})
+		if response.status_code == 404:
+			print("Sorry, that item is not on your list.")
+		else:
+			print("Your wishlist has been updated.")
+
+
+def addToWishList():
+	newItem = input("What is the name of the item you would like to add? ").strip().capitalize()
+	itemLink = input("If you would like to add a link, please enter it now: ").strip()
+	validURL = False
+	while itemLink != "" and not(validURL):
+		print("Sorry, that is not a valid URL. (Type in the entire name, including the 'https://...'")
+		itemLink = input("If you would like to add a link, please enter it now: [Enter to skip] ").strip()
+		try:
+			response = requests.get(itemLink)
+			if response.status_code == 200:
+				validURL = True
+		except:
+			pass
+	if itemLink == "":
+		itemLink = None
+	response = sendPostRequest("/addWishList", {"item": newItem, "link": itemLink})
+	if response.status_code == 403:
+		print("Sorry, that item is already on your list.")
+	else:
+		print("Your wishlist has been updated.")
+
+
 def mainLoop():
 	command = ""
 	while command != "exit":
 		command = input("What would you like to do? ").strip().lower()
 		if command == "chat":
 			chatManager()
+		elif command.split()[0] == "wishlist":
+			wishListManager(command)
 
 
 print("Welcome to Clause CLI: the Command Line Interface for Secret Santa!")

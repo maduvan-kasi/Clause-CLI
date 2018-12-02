@@ -252,4 +252,55 @@ app.post('/sendChat', (req, res) => {
 	
 })
 
+app.post('/viewWishList', (req, res) => {
+	var groupsFile = refreshFile(groupsFileName)
+	var wishListOwner = groupsFile[req.body.group].members[req.body.wishlister]
+	if (wishListOwner != undefined) {
+		var response
+		if (req.body.wishlister == findNameByToken(req.body.token)) {
+			response = `Your Wishlist:\n`
+			res.status(201)
+		} else {
+			response = `${req.body.wishlister}'s Wishlist:\n`
+		}
+		for (var item in wishListOwner.wishlist) {
+			response += item
+			if (wishListOwner.wishlist[item] == null) {
+				response += " [no link]\n"
+			} else {
+				response += ": " + wishListOwner.wishlist[item] + "\n"
+			}
+		}
+		res.send(response)
+	} else {
+		res.sendStatus(404)
+	}
+})
+
+app.post('/addWishList', (req, res) => {
+	var groupsFile = refreshFile(groupsFileName)
+	var user = groupsFile[req.body.group].members[findNameByToken(req.body.token)]
+
+	if (user.wishlist.hasOwnProperty(req.body.item)) {
+		res.sendStatus(403)
+	} else {
+		user.wishlist[req.body.item] = req.body.link
+		fs.writeFile(groupsFileName, JSON.stringify(groupsFile, null, 2), defaultCallback)
+		res.sendStatus(200)
+	}
+})
+
+app.post('/removeWishList', (req, res) => {
+	var groupsFile = refreshFile(groupsFileName)
+	var user = groupsFile[req.body.group].members[findNameByToken(req.body.token)]
+
+	if (user.wishlist.hasOwnProperty(req.body.item)) {
+		delete user.wishlist[req.body.item]
+		fs.writeFile(groupsFileName, JSON.stringify(groupsFile, null, 2), defaultCallback)
+		res.sendStatus(200)
+	} else {
+		res.sendStatus(404)
+	}
+})
+
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
