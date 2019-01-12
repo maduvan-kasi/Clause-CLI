@@ -5,7 +5,7 @@ const app = express()
 const port = 8080
 
 const crypto = require('crypto')
-const salt = "REDACTED"
+const salt = "ALC94NYJV9SF"
 
 const chance = require('chance').Chance()
 
