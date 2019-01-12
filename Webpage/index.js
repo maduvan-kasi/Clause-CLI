@@ -2,10 +2,10 @@
 
 const express = require('express')
 const app = express()
-const port = 8080
+const port = 80
 
 const crypto = require('crypto')
-const salt = "ALC94NYJV9SF"
+const salt = "REDACTED"
 
 const chance = require('chance').Chance()
 
@@ -303,4 +303,4 @@ app.post('/removeWishList', (req, res) => {
 	}
 })
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.listen(port, () => console.log(`Clause CLI started on port ${port}!`))
