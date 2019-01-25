@@ -1,7 +1,7 @@
 import getpass
 import requests
 
-SERVER_URL = "http://localhost:8080" #"http://clausecli.tk"
+SERVER_URL = "http://clausecli.tk"
 group = ""
 token = ""
 

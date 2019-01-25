@@ -9,7 +9,7 @@ It also handles drawing names and counting down to the final exhange day.
 
 <b> Creating/Joining a Group </b>
 
-If you are the first one in your group to use Clause Cli, you will have to Create a Group.
+If you are the first one in your group to use Clause CLI, you will have to Create a Group.
 Here, you will choose your Group Name, and the date of your exchange.
 Everyone in a group will have a unique name and password - these are what you use to access your wishlist updater and chat log.
 
