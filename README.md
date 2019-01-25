@@ -18,7 +18,6 @@ Everyone in a group will have a unique name and password - these are what you us
 In the main menu, your basic options are to <i>Chat</i> or view a <i>Wishlist</i>.
 When you are in one of these interfaces, simply follow the prompts on screen.
 At any time, you may type <i>exit</i> to return to the previous context.
-You may also type <i>help</i> at any time to view this document.
 
 <b> Chatting </b>
 
