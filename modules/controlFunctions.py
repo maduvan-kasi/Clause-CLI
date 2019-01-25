@@ -11,7 +11,7 @@ def removeManager():
 	managerStack.pop()
 
 def getInput(prompt):
-	userInput = input(prompt)
+	userInput = input(prompt).strip().lower()
 	if userInput == "exit":
 		if len(managerStack) > 1:
 			removeManager()

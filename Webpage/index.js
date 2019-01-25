@@ -2,12 +2,14 @@
 
 const express = require('express')
 const app = express()
-const port = 80
+const port = 8080
 
 const crypto = require('crypto')
 const salt = "REDACTED"
 
 const chance = require('chance').Chance()
+
+const moment = require('moment')
 
 const fs = require('fs')
 const groupsFileName = "./groups.json"
@@ -161,7 +163,22 @@ app.post('/home', (req, res) => {
 		res.status(201)
 	} else {
 		var member = findNameByToken(req.body.token)
-		responseMsg += `You are giving a gift to ${groupsFile[groupName].members[member].giftGivee}!`
+		responseMsg += `You are giving a gift to ${groupsFile[groupName].members[member].giftGivee}!\n`
+
+		var eventDate = moment(groupsFile[groupName].eventDate).utcOffset(0)
+		eventDate.set({hour:0,minute:0,second:0,millisecond:0})
+		var currentDate = moment().utcOffset(0)
+		currentDate.set({hour:0,minute:0,second:0,millisecond:0})
+		var daysTilEvent = eventDate.diff(currentDate, "days")
+
+		if (daysTilEvent == 0) {
+			responseMsg += "Your exchange takes place today!"
+		} else if (daysTilEvent > 0) {
+			responseMsg += `Your exchange takes place in ${daysTilEvent} days.`
+		} else {
+			responseMsg += `Your exchange took place ${-1 * daysTilEvent} days ago.\n`
+			responseMsg += `This group will be deleted in ${10 + daysTilEvent} days.`
+		}
 	}
 	res.send(responseMsg)
 })

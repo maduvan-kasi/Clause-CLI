@@ -31,7 +31,10 @@ def selectGroup():
 					for i in range(3):
 						eventDate[i] = int(eventDate[i])
 					eventDate = datetime.date(eventDate[0], eventDate[1], eventDate[2])
-					validDate = True
+					if eventDate < datetime.date.today():
+						print("Sorry, you can not choose a date in the past.")
+					else:
+						validDate = True
 				except:
 					print("Sorry, that doesn't seem to be a valid date.")
 			response = serverFunctions.sendPostRequest("/creategroup", {"groupName":groupName, "date":eventDate.isoformat()})
