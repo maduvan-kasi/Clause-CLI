@@ -23,7 +23,7 @@ def selectGroup():
 	while serverFunctions.group == "":
 		command = getInput("Enter your Group name or type 'Create Group': ").strip()
 		if command.lower() == "create group":
-			groupName = input("Choose a Group name: ").strip()
+			groupName = getInput("Choose a Group name: ").strip()
 			validDate = False
 			while validDate == False:
 				eventDate = input("Choose a date for your Secret Santa: [YYYY/MM/DD] ").split("/")
