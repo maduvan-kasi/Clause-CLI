@@ -61,6 +61,13 @@ def checkStatus():
 
 
 print("Welcome to Clause CLI: the Command Line Interface for Secret Santa!")
+# ---------------------------------------------------------------------------------------------------------------
+# REMOVE THESE LINES IF YOU ARE HOSTING YOUR OWN SERVER AND WISH TO USE CLAUSE CLI
+print("The developer has shut down the server for this application. Using just the CLI is now non-functional.")
+print("Feel free to use the server code provided in the git repo to host a server yourself.")
+print("Thanks for using Clause CLI!")
+exit()
+# ---------------------------------------------------------------------------------------------------------------
 selectGroup()
 serverFunctions.signIn()
 checkStatus()

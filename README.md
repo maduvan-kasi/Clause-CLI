@@ -1,7 +1,14 @@
 # Clause-CLI
 Command Line Interface for Secret Santa
 
-<b> How it works </b>
+## Notice
+
+<i> This project has been discontinued.  
+The original server has been shutdown, and the CLI is no longer usable on its own.  
+You may feel free to host your own server using the code available in this repository.  
+There may exist undiscovered bugs in both the client and server code.</i>
+
+## How it works
 
 Clause CLI serves as a hub for your Secret Santa exchange.
 It allows groups to chat anonymously (1-way) and manage their own wishlists.
